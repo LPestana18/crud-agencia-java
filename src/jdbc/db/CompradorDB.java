@@ -153,4 +153,40 @@ public class CompradorDB {
             e.printStackTrace();
         }
     }
+
+    public static void testTypeScroll() {
+        String sql = "SELECT id, nome, cpf FROM comprador";
+        Connection conn = ConnectionFactory.getConexao();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.last()) {
+                System.out.println("Ultima linha: " + new Comprador(rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
+                System.out.println("Número da ultima linha: " + rs.getRow());
+            }
+            System.out.println("Retornou para a primeira linha: " + rs.first());
+            System.out.println("Primeira linha: " + rs.getRow());
+            rs.absolute(4);
+            System.out.println("Linha 4 " + new Comprador(rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
+
+            rs.relative(-1);
+            System.out.println("Linha 3 " + new Comprador(rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
+
+            rs.relative(-2);
+            System.out.println("Linha " + new Comprador(rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
+
+            System.out.println(rs.isLast());
+            System.out.println(rs.isFirst());
+
+            rs.afterLast();
+            System.out.println("----------------");
+            while (rs.previous()) {
+                System.out.println(" " + new Comprador(rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
+            }
+            ConnectionFactory.close(conn, stmt, rs);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 }
