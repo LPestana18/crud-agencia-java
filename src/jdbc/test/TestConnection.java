@@ -17,7 +17,9 @@ public class TestConnection {
 //        CompradorDB.selectMetaData();
 //        CompradorDB.checkDriverStatus();
 //        CompradorDB.testTypeScroll();
-        CompradorDB.updateNomesToLowerCase();
+//        CompradorDB.updateNomesToLowerCase();
+//        System.out.println(CompradorDB.search("ria"));
+        CompradorDB.updatePS(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva" ));
     }
 
     private static void inserir() {

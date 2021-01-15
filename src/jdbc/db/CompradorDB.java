@@ -58,6 +58,26 @@ public class CompradorDB {
         }
     }
 
+    public static void updatePS(Comprador comprador) {
+        if (comprador == null || comprador.getId() == null) {
+            System.out.println("Não foi possivel atualizar o registro!");
+            return;
+        }
+        String sql = "UPDATE `agencia`.`comprador` SET `cpf`= ?, `nome`= ? WHERE `id`= ? ";
+        Connection conn = ConnectionFactory.getConexao();
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, comprador.getCpf());
+            ps.setString(2, comprador.getNome());
+            ps.setInt(3, comprador.getId());
+            ps.executeUpdate();
+            ConnectionFactory.close(conn, ps);
+            System.out.println("Registro atualizado com sucesso!");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     public static List<Comprador> selectAll() {
         String sql = "SELECT id, nome, cpf FROM comprador";
         Connection conn = ConnectionFactory.getConexao();
@@ -91,6 +111,27 @@ public class CompradorDB {
                         (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
             }
             ConnectionFactory.close(conn, stmt, rs);
+            return compradorList;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<Comprador> search(String nome) {
+        String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like ?";
+        Connection conn = ConnectionFactory.getConexao();
+        List<Comprador> compradorList = new ArrayList<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "%" + nome + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                compradorList.add(new Comprador
+                        (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
+            }
+            ConnectionFactory.close(conn, ps, rs);
             return compradorList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
