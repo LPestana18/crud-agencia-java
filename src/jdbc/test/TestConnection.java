@@ -11,10 +11,11 @@ public class TestConnection {
 //        deletar();
 //        atualizar();
 //        List<Comprador> listaComprador = selecionarTudo();
-        List<Comprador> listaComprador2 = buscarPorNome("ria");
+//        List<Comprador> listaComprador2 = buscarPorNome("ria");
 //        System.out.println(listaComprador);
-        System.out.println(listaComprador2);
-
+//        System.out.println(listaComprador2);
+//        CompradorDB.selectMetaData();
+        CompradorDB.checkDriverStatus();
     }
 
     private static void inserir() {
@@ -36,6 +37,7 @@ public class TestConnection {
     public static List<Comprador> selecionarTudo() {
         return CompradorDB.selectAll();
     }
+
     public static List<Comprador> buscarPorNome(String nome) {
         return CompradorDB.searchByName(nome);
     }

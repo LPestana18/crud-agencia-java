@@ -3,10 +3,7 @@ package jdbc.db;
 import jdbc.Classes.Comprador;
 import jdbc.conn.ConnectionFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +78,7 @@ public class CompradorDB {
     }
 
     public static List<Comprador> searchByName(String nome) {
-        String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like '%" + nome +"%'";
+        String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like '%" + nome + "%'";
         Connection conn = ConnectionFactory.getConexao();
         List<Comprador> compradorList = new ArrayList<>();
         try {
@@ -98,5 +95,62 @@ public class CompradorDB {
             throwables.printStackTrace();
         }
         return null;
+    }
+
+    public static void selectMetaData() {
+        String sql = "SELECT * FROM comprador";
+        Connection conn = ConnectionFactory.getConexao();
+
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            ResultSetMetaData rsmd = rs.getMetaData();
+
+            rs.next();
+            int qtdColunas = rsmd.getColumnCount();
+            System.out.println("Quantidade de colunas: " + qtdColunas);
+
+            for (int i = 1; i <= qtdColunas; i++) {
+                System.out.println("tabela: " + rsmd.getTableName(i));
+                System.out.println("Nome coluna: " + rsmd.getColumnName(i));
+                System.out.println("Tamanho coluna: " + rsmd.getColumnDisplaySize(i));
+            }
+
+            ConnectionFactory.close(conn, stmt, rs);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public static void checkDriverStatus() {
+        Connection conn = ConnectionFactory.getConexao();
+
+        try {
+            DatabaseMetaData dbmd = conn.getMetaData();
+            if (dbmd.supportsResultSetType(ResultSet.TYPE_FORWARD_ONLY)) {
+                System.out.println("Supporta TYPE_FORWARD_ONLY");
+                if (dbmd.supportsResultSetConcurrency(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
+                    System.out.println("e também suporta CONCUR_UPDATABLE");
+                }
+            }
+
+            if (dbmd.supportsResultSetType(ResultSet.TYPE_SCROLL_INSENSITIVE)) {
+                System.out.println("Supporta TYPE_SCROLL_INSENSITIVE");
+                if (dbmd.supportsResultSetConcurrency(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                    System.out.println("e também suporta CONCUR_UPDATABLE");
+                }
+            }
+
+            if (dbmd.supportsResultSetType(ResultSet.TYPE_SCROLL_SENSITIVE)) {
+                System.out.println("Supporta TYPE_SCROLL_SENSITIVE");
+                if (dbmd.supportsResultSetConcurrency(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                    System.out.println("e também suporta CONCUR_UPDATABLE");
+                }
+            }
+
+            ConnectionFactory.close(conn);
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
