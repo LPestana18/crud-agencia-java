@@ -1,11 +1,13 @@
 package jdbc.test;
 
-import jdbc.conn.ConnectionFactory;
+import jdbc.Classes.Comprador;
+import jdbc.db.CompradorDB;
 
 public class TestConnection {
 
     public static void main(String[] args) {
-        ConnectionFactory conn = new ConnectionFactory();
-        conn.getConexao();
+        Comprador comprador = new Comprador("111.111.222-34", "Aline");
+        CompradorDB compradorDB = new CompradorDB();
+        compradorDB.save(comprador);
     }
 }
