@@ -3,11 +3,18 @@ package jdbc.test;
 import jdbc.Classes.Comprador;
 import jdbc.db.CompradorDB;
 
+import java.util.List;
+
 public class TestConnection {
 
     public static void main(String[] args) {
 //        deletar();
-        atualizar();
+//        atualizar();
+//        List<Comprador> listaComprador = selecionarTudo();
+        List<Comprador> listaComprador2 = buscarPorNome("ria");
+//        System.out.println(listaComprador);
+        System.out.println(listaComprador2);
+
     }
 
     private static void inserir() {
@@ -22,7 +29,14 @@ public class TestConnection {
     }
 
     public static void atualizar() {
-        Comprador comprador = new Comprador(1,"000.000.000-00", "MARIA");
+        Comprador comprador = new Comprador(1, "000.000.000-00", "MARIA");
         CompradorDB.update(comprador);
+    }
+
+    public static List<Comprador> selecionarTudo() {
+        return CompradorDB.selectAll();
+    }
+    public static List<Comprador> buscarPorNome(String nome) {
+        return CompradorDB.searchByName(nome);
     }
 }

@@ -1,9 +1,6 @@
 package jdbc.conn;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class ConnectionFactory {
     // java.sql = Connection, Statement, Resultset
@@ -36,6 +33,17 @@ public class ConnectionFactory {
         try {
             if (stmt != null) {
                 stmt.close();
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void close(Connection connection, Statement stmt, ResultSet rs) {
+        close(connection, stmt);
+        try {
+            if (rs != null) {
+                rs.close();
             }
         }catch (SQLException e) {
             e.printStackTrace();
