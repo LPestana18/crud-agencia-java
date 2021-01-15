@@ -16,7 +16,8 @@ public class TestConnection {
 //        System.out.println(listaComprador2);
 //        CompradorDB.selectMetaData();
 //        CompradorDB.checkDriverStatus();
-        CompradorDB.testTypeScroll();
+//        CompradorDB.testTypeScroll();
+        CompradorDB.updateNomesToLowerCase();
     }
 
     private static void inserir() {

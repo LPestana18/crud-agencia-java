@@ -6,6 +6,7 @@ import jdbc.conn.ConnectionFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class CompradorDB {
 
@@ -41,7 +42,7 @@ public class CompradorDB {
 
     public static void update(Comprador comprador) {
         if (comprador == null || comprador.getId() == null) {
-            System.out.println("Não foi possivle atualizar o registro!");
+            System.out.println("Não foi possivel atualizar o registro!");
             return;
         }
         String sql =
@@ -184,6 +185,49 @@ public class CompradorDB {
             while (rs.previous()) {
                 System.out.println(" " + new Comprador(rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
             }
+            ConnectionFactory.close(conn, stmt, rs);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public static void updateNomesToLowerCase(){
+        String sql = "SELECT id, nome, cpf FROM comprador";
+        Connection conn = ConnectionFactory.getConexao();
+        try {
+            DatabaseMetaData dbmd = conn.getMetaData();
+            Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = stmt.executeQuery(sql);
+            System.out.println(dbmd.updatesAreDetected(ResultSet.TYPE_SCROLL_INSENSITIVE));
+            System.out.println(dbmd.insertsAreDetected(ResultSet.TYPE_SCROLL_INSENSITIVE));
+            System.out.println(dbmd.deletesAreDetected(ResultSet.TYPE_SCROLL_INSENSITIVE));
+
+            if (rs.next()) {
+                rs.updateString("nome", rs.getString("nome").toUpperCase());
+                rs.cancelRowUpdates();
+                rs.updateRow();
+//                if (rs.rowUpdated()) {
+//                    System.out.println("Linha atualizada!");
+//                }
+            }
+
+//            rs.absolute(2);
+//            String nome = rs.getString("nome");
+//            rs.moveToInsertRow();
+//            rs.updateString("nome", nome.toUpperCase());
+//            rs.updateString("cpf", "999.999.999-99");
+//            rs.insertRow();
+//            rs.moveToCurrentRow();
+//            System.out.println(rs.getString("nome") + " row" + rs.getRow());
+
+            rs.absolute(10);
+            rs.deleteRow();
+
+//            rs.beforeFirst();
+//            while (rs.next()) {
+//                System.out.println(rs.getString("nome"));
+//            }
+
             ConnectionFactory.close(conn, stmt, rs);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
