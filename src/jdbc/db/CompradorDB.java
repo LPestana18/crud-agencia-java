@@ -118,7 +118,7 @@ public class CompradorDB {
         return null;
     }
 
-    public static List<Comprador> search(String nome) {
+    public static List<Comprador> searchPS(String nome) {
         String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like ?";
         Connection conn = ConnectionFactory.getConexao();
         List<Comprador> compradorList = new ArrayList<>();
@@ -132,6 +132,26 @@ public class CompradorDB {
                         (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
             }
             ConnectionFactory.close(conn, ps, rs);
+            return compradorList;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<Comprador> searchByNameCallableStatement(String nome) {
+        String sql = "CALL `agencia`.SP_GetCompradoresPorNome( ? )";
+        Connection conn = ConnectionFactory.getConexao();
+        List<Comprador> compradorList = new ArrayList<>();
+        try {
+            CallableStatement cs = conn.prepareCall(sql);
+            cs.setString(1, "%" + nome + "%");
+            ResultSet rs = cs.executeQuery();
+            while (rs.next()) {
+                compradorList.add(new Comprador
+                        (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
+            }
+            ConnectionFactory.close(conn, cs, rs);
             return compradorList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();

@@ -19,7 +19,8 @@ public class TestConnection {
 //        CompradorDB.testTypeScroll();
 //        CompradorDB.updateNomesToLowerCase();
 //        System.out.println(CompradorDB.search("ria"));
-        CompradorDB.updatePS(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva" ));
+//        CompradorDB.updatePS(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva" ));
+        System.out.println(CompradorDB.searchByNameCallableStatement("Pre"));
     }
 
     private static void inserir() {
