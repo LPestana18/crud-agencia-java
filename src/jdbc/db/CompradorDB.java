@@ -1,8 +1,10 @@
 package jdbc.db;
 
 import jdbc.Classes.Comprador;
+import jdbc.Classes.MyRowSetListener;
 import jdbc.conn.ConnectionFactory;
 
+import javax.sql.rowset.JdbcRowSet;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +80,31 @@ public class CompradorDB {
         }
     }
 
+    public static void updateRowSet(Comprador comprador) {
+        if (comprador == null || comprador.getId() == null) {
+            System.out.println("Não foi possivel atualizar o registro!");
+            return;
+        }
+//        String sql = "UPDATE `agencia`.`comprador` SET `cpf`= ?, `nome`= ? WHERE `id`= ? ";
+        String sql = "SELECT * FROM comprador where id = ?";
+        JdbcRowSet jdbcRowSet = ConnectionFactory.getRowSetConnection();
+        jdbcRowSet.addRowSetListener(new MyRowSetListener());
+        try {
+            jdbcRowSet.setCommand(sql);
+//            jdbcRowSet.setString(1, comprador.getCpf());
+//            jdbcRowSet.setString(2, comprador.getNome());
+            jdbcRowSet.setInt(1, comprador.getId());
+            jdbcRowSet.execute();
+            jdbcRowSet.next();
+            jdbcRowSet.updateString("nome", "LUCAS");
+            jdbcRowSet.updateRow();
+            ConnectionFactory.close(jdbcRowSet);
+            System.out.println("Registro atualizado com sucesso!");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     public static List<Comprador> selectAll() {
         String sql = "SELECT id, nome, cpf FROM comprador";
         Connection conn = ConnectionFactory.getConexao();
@@ -132,6 +159,27 @@ public class CompradorDB {
                         (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
             }
             ConnectionFactory.close(conn, ps, rs);
+            return compradorList;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<Comprador> searchByNameRowSet (String nome) {
+        String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like ?";
+        JdbcRowSet jdbcRowSet = ConnectionFactory.getRowSetConnection();
+        jdbcRowSet.addRowSetListener(new MyRowSetListener());
+        List<Comprador> compradorList = new ArrayList<>();
+        try {
+            jdbcRowSet.setCommand(sql);
+            jdbcRowSet.setString(1, "%" + nome + "%");
+            jdbcRowSet.execute();
+            while (jdbcRowSet.next()) {
+                compradorList.add(new Comprador
+                        (jdbcRowSet.getInt("id"), jdbcRowSet.getString("nome"), jdbcRowSet.getString("cpf")));
+            }
+            ConnectionFactory.close(jdbcRowSet);
             return compradorList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
