@@ -3,10 +3,7 @@ package jdbc.db;
 import jdbc.Classes.Comprador;
 import jdbc.conn.ConnectionFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +12,11 @@ public class CompradorDAO {
     public static void save(Comprador comprador) {
         String sql = "INSERT INTO `agencia`.`comprador` (`cpf`, `nome`) VALUES (?, ?);";
 
-        try (Connection conn = ConnectionFactory.getConexao()) {
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-            ConnectionFactory.close(conn, stmt);
+        try (Connection conn = ConnectionFactory.getConexao();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, comprador.getCpf());
+            ps.setString(2, comprador.getNome());
+            ps.executeUpdate();
             System.out.println("Registro inserido com sucesso!");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -30,12 +28,11 @@ public class CompradorDAO {
             System.out.println("Não foi possivle excluir o registro!");
             return;
         }
-        String sql = "DELETE FROM comprador WHERE `id` = '" + comprador.getId() + "'";
-        Connection conn = ConnectionFactory.getConexao();
-        try {
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-            ConnectionFactory.close(conn, stmt);
+        String sql = "DELETE FROM comprador WHERE `id` = ?";
+        try (Connection conn = ConnectionFactory.getConexao();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, comprador.getId());
+            ps.executeUpdate();
             System.out.println("Registro excluido com sucesso!");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -48,12 +45,13 @@ public class CompradorDAO {
             return;
         }
         String sql =
-                "UPDATE `agencia`.`comprador` SET `cpf` = '" + comprador.getCpf() + "', `nome` = '" + comprador.getNome() + "' WHERE (`id` = '" + comprador.getId() + "');";
-        Connection conn = ConnectionFactory.getConexao();
-        try {
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-            ConnectionFactory.close(conn, stmt);
+                "UPDATE `agencia`.`comprador` SET `cpf` = ?, `nome` = ? WHERE (`id` = ?);";
+        try (Connection conn = ConnectionFactory.getConexao();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, comprador.getCpf());
+            ps.setString(2, comprador.getNome());
+            ps.setInt(3, comprador.getId());
+            ps.executeUpdate();
             System.out.println("Registro atualizado com sucesso!");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -62,17 +60,16 @@ public class CompradorDAO {
 
     public static List<Comprador> selectAll() {
         String sql = "SELECT id, nome, cpf FROM comprador";
-        Connection conn = ConnectionFactory.getConexao();
         List<Comprador> compradorList = new ArrayList<>();
-        try {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+
+        try (Connection conn = ConnectionFactory.getConexao();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 compradorList.add(new Comprador
-                        (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
+                        (rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
             }
-            ConnectionFactory.close(conn, stmt, rs);
             return compradorList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -81,18 +78,18 @@ public class CompradorDAO {
     }
 
     public static List<Comprador> searchByName(String nome) {
-        String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like '%" + nome + "%'";
-        Connection conn = ConnectionFactory.getConexao();
+        String sql = "SELECT id, nome, cpf FROM comprador WHERE nome like ?";
         List<Comprador> compradorList = new ArrayList<>();
-        try {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
 
+        try (Connection conn = ConnectionFactory.getConexao();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, "%" + nome + "%");
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 compradorList.add(new Comprador
                         (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
             }
-            ConnectionFactory.close(conn, stmt, rs);
+            ConnectionFactory.close(conn, ps, rs);
             return compradorList;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
