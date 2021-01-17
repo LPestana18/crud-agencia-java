@@ -59,7 +59,7 @@ public class CompradorDAO {
     }
 
     public static List<Comprador> selectAll() {
-        String sql = "SELECT id, nome, cpf FROM comprador";
+        String sql = "SELECT id, cpf, nome FROM comprador";
         List<Comprador> compradorList = new ArrayList<>();
 
         try (Connection conn = ConnectionFactory.getConexao();
@@ -68,7 +68,7 @@ public class CompradorDAO {
 
             while (rs.next()) {
                 compradorList.add(new Comprador
-                        (rs.getInt("id"), rs.getString("cpf"), rs.getString("nome")));
+                        (rs.getInt("id"), rs.getString("nome"), rs.getString("cpf")));
             }
             return compradorList;
         } catch (SQLException throwables) {
@@ -91,6 +91,26 @@ public class CompradorDAO {
             }
             ConnectionFactory.close(conn, ps, rs);
             return compradorList;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Comprador searchById(Integer id) {
+        String sql = "SELECT id, nome, cpf FROM comprador WHERE id = ?";
+        Comprador comprador = null;
+
+        try (Connection conn = ConnectionFactory.getConexao();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                comprador =
+                        new Comprador(rs.getInt("id"), rs.getString("nome"), rs.getString("cpf"));
+            }
+            ConnectionFactory.close(conn, ps, rs);
+            return comprador;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
