@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompradorDB {
+public class CompradorDBOLD {
 
     public static void save(Comprador comprador) {
         String sql = "INSERT INTO `agencia`.`comprador` (`cpf`, `nome`) VALUES ('" + comprador.getCpf() + "', '" + comprador.getNome() + "');";
@@ -22,6 +22,31 @@ public class CompradorDB {
             System.out.println("Registro inserido com sucesso!");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }
+    }
+
+    public static void saveTransaction() throws SQLException {
+        String sql = "INSERT INTO `agencia`.`comprador` (`cpf`, `nome`) VALUES ('TESTE1', 'TESTE1');";
+        String sql2 = "INSERT INTO `agencia`.`comprador` (`cpf`, `nome`) VALUES ('TESTE2', 'TESTE2');";
+        String sql3 = "INSERT INTO `agencia`.`comprador` (`cpf`, `nome`) VALUES ('TESTE3', 'TESTE3');";
+        Connection conn = ConnectionFactory.getConexao();
+        Savepoint savepoint = null;
+        try {
+            conn.setAutoCommit(false);
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            savepoint = conn.setSavepoint("One");
+            stmt.executeUpdate(sql2);
+            if (true)
+                throw new SQLException();
+            stmt.executeUpdate(sql3);
+            conn.commit();
+            ConnectionFactory.close(conn, stmt);
+            System.out.println("Registro inserido com sucesso!");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            conn.rollback(savepoint);
+            conn.commit();
         }
     }
 
