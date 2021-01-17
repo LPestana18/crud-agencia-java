@@ -1,6 +1,7 @@
 package jdbc.conn;
 
 import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JdbcRowSet;
 import javax.sql.rowset.RowSetProvider;
 import java.sql.*;
@@ -37,7 +38,23 @@ public class ConnectionFactory {
         return null;
     }
 
-    public static void close(JdbcRowSet jdbcRowSet) {
+    public static CachedRowSet getRowSetConnectionCached() {
+        String url = "jdbc:mysql://localhost:3306/agencia?useSSL=false&relaxAutoCommit=true";
+        String user= "root";
+        String password = "";
+        try {
+            CachedRowSet cachedRowSet = RowSetProvider.newFactory().createCachedRowSet();
+            cachedRowSet.setUrl(url);
+            cachedRowSet.setUsername(user);
+            cachedRowSet.setPassword(password);
+            return cachedRowSet;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void close(RowSet jdbcRowSet) {
         try {
             if (jdbcRowSet != null) {
                 jdbcRowSet.close();

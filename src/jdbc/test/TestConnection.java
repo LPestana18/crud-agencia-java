@@ -22,8 +22,8 @@ public class TestConnection {
 //        CompradorDB.updatePS(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva" ));
 //        System.out.println(CompradorDB.searchByNameCallableStatement("Pre"));
 //        System.out.println(CompradorDB.searchByNameRowSet("cio"));
-        CompradorDB.updateRowSet(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva"));
-
+//        CompradorDB.updateRowSet(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva"));
+        CompradorDB.updateRowSetCached(new Comprador(1, "011.011.011-01", "Prepared Statement da Silva"));
     }
 
     private static void inserir() {

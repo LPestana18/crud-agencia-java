@@ -4,11 +4,11 @@ import jdbc.Classes.Comprador;
 import jdbc.Classes.MyRowSetListener;
 import jdbc.conn.ConnectionFactory;
 
+import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JdbcRowSet;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CompradorDB {
 
@@ -99,6 +99,27 @@ public class CompradorDB {
             jdbcRowSet.updateString("nome", "LUCAS");
             jdbcRowSet.updateRow();
             ConnectionFactory.close(jdbcRowSet);
+            System.out.println("Registro atualizado com sucesso!");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public static void updateRowSetCached(Comprador comprador) {
+        if (comprador == null || comprador.getId() == null) {
+            System.out.println("Não foi possivel atualizar o registro!");
+            return;
+        }
+        String sql = "SELECT * FROM comprador where id = ?";
+        CachedRowSet crs = ConnectionFactory.getRowSetConnectionCached();
+        try {
+            crs.setCommand(sql);
+            crs.setInt(1, comprador.getId());
+            crs.execute();
+            crs.next();
+            crs.updateString("nome", "Lucas");
+            crs.updateRow();
+            crs.acceptChanges();
             System.out.println("Registro atualizado com sucesso!");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
